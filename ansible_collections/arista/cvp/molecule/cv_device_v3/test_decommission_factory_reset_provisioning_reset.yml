@@ -44,7 +44,7 @@
       - fqdn: "{{ DEVICE_NAME }}"
         parentContainerName: "{{CV_FACTS_V3_RESULT.data.cvp_devices[0].parentContainerName}}"
         configlets: "{{CV_FACTS_V3_RESULT.data.cvp_devices[0].configlets}}"
-    
+
     CVP_DEVICES_STATE_ABSENT_BY_SERIAL_DEPLOY:
       - serialNumber: "{{ DEVICE_ABSENT_BY_SERIAL.SERIAL }}"
         parentContainerName: "{{CV_FACTS_V3_RESULT_DEVICE_ABSENT_BY_SERIAL.data.cvp_devices[0].parentContainerName}}"
@@ -65,7 +65,7 @@
           - devices
         regexp_filter: "{{ DEVICE_NAME }}"
       register: CV_FACTS_V3_RESULT
-    
+
     - name: Collect devices facts for {{ DEVICE_ABSENT_BY_SERIAL.NAME }} from {{ inventory_hostname }}
       arista.cvp.cv_facts_v3:
         facts:

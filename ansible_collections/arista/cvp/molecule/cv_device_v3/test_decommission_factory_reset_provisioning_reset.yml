@@ -473,6 +473,33 @@
       retries: 10
       delay: 2
 
+    - name: Pause for 10 seconds for streaming to start
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Add target device to inventory
+      add_host:
+        name: "{{ DEVICE_ABSENT_BY_SERIAL.NAME }}"
+        groups: target_device
+        ansible_user: arista
+        ansible_password: "{{ lookup('env', 'LABPASSPHRASE') }}"
+        ansible_connection: httpapi
+        ansible_network_os: eos
+        ansible_httpapi_port: 443
+        ansible_httpapi_use_ssl: True
+        ansible_httpapi_validate_certs: False
+
+    - name: Restart TerminAttr (needed on ATD)
+      run_once: true
+      delegate_to: "{{ DEVICE_ABSENT_BY_SERIAL.NAME }}"
+      arista.eos.eos_command:
+        commands:
+          - enable
+          - configure
+          - daemon TerminAttr
+          - shutdown
+          - no shutdown
+
     - name: Checking onboarding status for device {{ DEVICE_ABSENT_BY_SERIAL.NAME }}
       ansible.builtin.uri:
         url: "{{ onboarding_status_api }}"
@@ -486,8 +513,8 @@
         body: "{}"
       register: onboarding_status
       until: onboarding_status.json.value.status == "ONBOARDING_STATUS_SUCCESS"
-      retries: 10
-      delay: 2
+      retries: 30
+      delay: 5
 
     - name: Adding device {{ DEVICE_ABSENT_BY_SERIAL.NAME }} back to the original container
       arista.cvp.cv_device_v3:
